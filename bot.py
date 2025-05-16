@@ -3,8 +3,14 @@ import discord
 from discord.ext import commands
 from discord.ui import View, Button, Modal, TextInput
 import os
-token = os.getenv("MTM3MjYzMjcwNDU5OTk4NjIzNw.GpsDlw.30RnOvci4BmEQZsFEDr10dZbbeopAfYj5N6lxw")
 
+token = os.getenv("MTM3MjYzMjcwNDU5OTk4NjIzNw.G0JDtx.5hyjcsY-XFviJ9Z3bn_jDlt2z39J2HVLC_UnYw")
+if token is None:
+    print("Error: TOKEN environment variable not found!")
+    exit(1)
+
+bot = discord.Bot(intents=discord.Intents.all())
+bot.run(token)
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True  # Only needed if your bot uses member info
@@ -195,4 +201,4 @@ async def requesttest(ctx):
 
     await target_channel.send(embed=embed, view=view)
     
-bot.run("MTM3MjYzMjcwNDU5OTk4NjIzNw.GpsDlw.30RnOvci4BmEQZsFEDr10dZbbeopAfYj5N6lxw")
+bot.run("MTM3MjYzMjcwNDU5OTk4NjIzNw.G0JDtx.5hyjcsY-XFviJ9Z3bn_jDlt2z39J2HVLC_UnYw")

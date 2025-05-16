@@ -215,4 +215,4 @@ async def requesttest(ctx):
     await channel.send(embed=embed, view=view)
     await ctx.send("✅ Tier test request message sent.")
 
-bot.run("MTM3MjYzMjcwNDU5OTk4NjIzNw.GpsDlw.30RnOvci4BmEQZsFEDr10dZbbeopAfYj5N6lxw")
+bot.run("MTM3MjYzMjcwNDU5OTk4NjIzNw.G0JDtx.5hyjcsY-XFviJ9Z3bn_jDlt2z39J2HVLC_UnYw")
