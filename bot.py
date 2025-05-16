@@ -18,12 +18,17 @@ intents.members = True    # Needed for member info
 
 
 import discord
-from discord.ext import commands
 
 intents = discord.Intents.default()
-intents.members = True  # This is a privileged intent
-# Optional: enable presence if needed
-# intents.presences = True
+intents.message_content = True  # Needed to read message content
+intents.members = True          # Needed for member events
+intents.guilds = True
+
+bot = discord.Bot(intents=intents)
+
+from discord.ext import commands
+
+
 
 
 
