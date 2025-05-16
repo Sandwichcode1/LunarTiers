@@ -1,0 +1,16 @@
+intents = discord.Intents.default()
+intents.message_content = True
+intents.members = True
+
+bot = commands.Bot(command_prefix='!', intents=intents)
+member = []
+queue = []
+queue_message = None
+info_message = None
+queue_channel = None
+queue_creator = None
+queue_region = None
+user_cooldowns = {}
+allowed_regions = ["NA", "EU", "ASIA", "SA", "OCE", "AFRICA"]
+request_channel_id = 1368153339753140306  # Replace with actual channel ID
+waitlist_role_name = "Waitlist"
