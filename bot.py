@@ -2,6 +2,9 @@
 import discord
 from discord.ext import commands
 from discord.ui import View, Button, Modal, TextInput
+import os
+token = os.getenv("MTM3MjYzMjcwNDU5OTk4NjIzNw.GpsDlw.30RnOvci4BmEQZsFEDr10dZbbeopAfYj5N6lxw")
+
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True  # Only needed if your bot uses member info
@@ -27,7 +30,7 @@ info_message = None
 queue_channel = None
 queue_creator = None
 queue_region = None
-
+bot.run(token)
 
 @bot.command()
 @commands.has_permissions(administrator=True)
