@@ -143,7 +143,7 @@ async def closequeue(ctx):
 
 
 
-bot.run("MTM3MjYzMzkwNzk5NjEzMTQxOQ.Gk48xV.MDVys6rphgeMBLahsge_GZV1jXMxXKcq3bvJA8")
+
 
 
 
@@ -178,3 +178,5 @@ async def requesttest(ctx):
     view = QueueView()
 
     await target_channel.send(embed=embed, view=view)
+    
+bot.run("MTM3MjYzMjcwNDU5OTk4NjIzNw.Gqy4Ie.zrEMiR20m-oVOVE19vivCR_b2tvZI9sLhIB86A")
