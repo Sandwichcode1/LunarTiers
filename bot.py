@@ -5,6 +5,9 @@ from discord.ui import View, Button, Modal, TextInput
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True  # Only needed if your bot uses member info
+intents.presences = True  # Needed for presence (online/offline)
+intents.members = True    # Needed for member info
+
 
 import discord
 from discord.ext import commands
@@ -30,8 +33,8 @@ queue_region = None
 @commands.has_permissions(administrator=True)
 async def removecooldown(ctx, member: discord.Member):
     """Remove the 24h cooldown for a specific user."""
-    if member.id in user_cooldowns:
-        del user_cooldowns[member.id]
+    if member.id in user_cooldowns: # type: ignore
+        del user_cooldowns[member.id] # type: ignore
         await ctx.send(f"✅ Cooldown removed for {member.mention}.")
     else:
         await ctx.send(f"ℹ️ {member.mention} has no active cooldown.")
@@ -189,4 +192,4 @@ async def requesttest(ctx):
 
     await target_channel.send(embed=embed, view=view)
     
-bot.run("MTM3MjYzMjcwNDU5OTk4NjIzNw.GsYyu9.Tsqfv5t98fY4Z3CS1XKkFENeHigeirOrDnSz6U")
+bot.run("MTM3MjYzMjcwNDU5OTk4NjIzNw.GpsDlw.30RnOvci4BmEQZsFEDr10dZbbeopAfYj5N6lxw")

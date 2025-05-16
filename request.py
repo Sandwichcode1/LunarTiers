@@ -8,7 +8,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
-request = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents)
 member = []
 queue = []
 queue_message = None
@@ -91,7 +91,7 @@ async def update_info_embed():
     embed.set_footer(text="Thanks for using this queue bot!")
     await info_message.edit(embed=embed)
 
-@request.command()
+@bot.command()
 async def createqueue(ctx, *, region: str = "Unknown"):
     global queue_message, info_message, queue_channel, queue_creator, queue_region
     queue.clear()
@@ -112,7 +112,7 @@ async def createqueue(ctx, *, region: str = "Unknown"):
     info_message = await ctx.send(embed=info_embed)
     await ctx.send(f"✅ Queue created by {queue_creator.mention} for region: **{queue_region}**")
 
-@request.command()
+@bot.command()
 async def leave(ctx):
     global queue
     user_id = ctx.author.id
@@ -124,7 +124,7 @@ async def leave(ctx):
     else:
         await ctx.send("You're not in the queue.")
 
-@request.command()
+@bot.command()
 async def pull(ctx):
     global queue
     if not queue:
@@ -159,7 +159,7 @@ async def pull(ctx):
     except Exception as e:
         await ctx.send(f"❌ Error creating channel: {e}")
 
-@request.command()
+@bot.command()
 @commands.has_permissions(administrator=True)
 async def close(ctx, member: discord.Member):
     global queue, user_cooldowns
@@ -191,7 +191,7 @@ async def close(ctx, member: discord.Member):
 
     await ctx.send(f"✅ {member.mention} has been removed from the queue, put on cooldown, lost waitlist access, and their match channel was deleted (if existed).")
 
-@request.command()
+@bot.command()
 @commands.has_permissions(administrator=True)
 async def removecooldown(ctx, member: discord.Member):
     if member.id in user_cooldowns:
@@ -200,9 +200,9 @@ async def removecooldown(ctx, member: discord.Member):
     else:
         await ctx.send(f"ℹ️ {member.mention} has no active cooldown.")
 
-@request.command()
+@bot.command()
 async def requesttest(ctx):
-    channel = request.get_channel(request_channel_id)
+    channel = bot.get_channel(request_channel_id)
     if not channel:
         await ctx.send("❌ Could not find the request channel.")
         return
@@ -215,4 +215,4 @@ async def requesttest(ctx):
     await channel.send(embed=embed, view=view)
     await ctx.send("✅ Tier test request message sent.")
 
-request.run("MTM3MjYzMjcwNDU5OTk4NjIzNw.GsYyu9.Tsqfv5t98fY4Z3CS1XKkFENeHigeirOrDnSz6U")
+bot.run("MTM3MjYzMjcwNDU5OTk4NjIzNw.GpsDlw.30RnOvci4BmEQZsFEDr10dZbbeopAfYj5N6lxw")
