@@ -4,13 +4,12 @@ from discord.ext import commands
 from discord.ui import View, Button, Modal, TextInput
 import os
 
-token = os.getenv("TOKEN")
-if token is None:
-    print("Error: TOKEN environment variable not found!")
-    exit(1)
+import os
 
-bot = discord.Bot(intents=discord.Intents.all())
-bot.run(token)
+
+
+
+
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True  # Only needed if your bot uses member info
@@ -30,6 +29,13 @@ intents.members = True  # This is a privileged intent
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+
+token = os.getenv("TOKEN")
+if token is None:
+    print("TOKEN environment variable not found!")
+    exit(1)
+
+bot.run(token)
 queue = []  # list of dicts with keys: user_id, mention, ign, region
 queue_message = None
 info_message = None
@@ -37,7 +43,7 @@ queue_channel = None
 queue_creator = None
 queue_region = None
 bot.run(token)
-
+bot = discord.Bot(intents=discord.Intents.all())
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def removecooldown(ctx, member: discord.Member):
