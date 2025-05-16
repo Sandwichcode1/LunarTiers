@@ -4,7 +4,7 @@ from discord.ext import commands
 from discord.ui import View, Button, Modal, TextInput
 import os
 
-token = os.getenv("MTM3MjYzMjcwNDU5OTk4NjIzNw.G0JDtx.5hyjcsY-XFviJ9Z3bn_jDlt2z39J2HVLC_UnYw")
+token = os.getenv("TOKEN")
 if token is None:
     print("Error: TOKEN environment variable not found!")
     exit(1)
