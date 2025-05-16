@@ -1,3 +1,6 @@
+intents = discord.Intents.default()
+intents.message_content = True
+intents.members = True  # Only needed if your bot uses member info
 import discord
 from discord.ext import commands
 from discord.ui import View, Button, Modal, TextInput
