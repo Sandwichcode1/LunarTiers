@@ -189,4 +189,4 @@ async def requesttest(ctx):
 
     await target_channel.send(embed=embed, view=view)
     
-bot.run("MTM3MjYzMjcwNDU5OTk4NjIzNw.Gqy4Ie.zrEMiR20m-oVOVE19vivCR_b2tvZI9sLhIB86A")
+bot.run("MTM3MjYzMjcwNDU5OTk4NjIzNw.GsYyu9.Tsqfv5t98fY4Z3CS1XKkFENeHigeirOrDnSz6U")
