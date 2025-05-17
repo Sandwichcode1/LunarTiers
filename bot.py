@@ -1,7 +1,33 @@
 
 import discord
 from discord.ext import commands
-from discord.ui import View, Button, Modal, TextInput
+import discord
+import discord
+from discord.ext import commands
+import discord
+
+
+from discord.ui import Modal, TextInput  # This only works with Pycord 2.0+
+
+intents = discord.Intents.all()
+bot = commands.Bot(command_prefix="!", intents=intents)
+
+class MyModal(Modal):
+    def __init__(self):
+        super().__init__(title="My Modal")
+
+        self.input = TextInput(label="Enter something:")
+        self.add_item(self.input)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.send_message(f"You typed: {self.input.value}", ephemeral=True)
+
+@bot.command()
+async def openmodal(ctx):
+    await ctx.send_modal(MyModal())
+
+bot.run("MTM3MjYzMzkwNzk5NjEzMTQxOQ.GDjYD7.KUq5c9B6wfMQVDtkMCeiYuVT2gQVSq5QLwkuN0")  # Replace or use an environment variable
+
 import os
 
 import os
@@ -26,7 +52,6 @@ intents.guilds = True
 
 bot = discord.Bot(intents=intents)
 
-from discord.ext import commands
 
 
 
@@ -209,4 +234,4 @@ async def requesttest(ctx):
 
     await target_channel.send(embed=embed, view=view)
     
-bot.run("MTM3MjYzMjcwNDU5OTk4NjIzNw.G0JDtx.5hyjcsY-XFviJ9Z3bn_jDlt2z39J2HVLC_UnYw")
+bot.run("MTM3MjYzMzkwNzk5NjEzMTQxOQ.GDjYD7.KUq5c9B6wfMQVDtkMCeiYuVT2gQVSq5QLwkuN0")

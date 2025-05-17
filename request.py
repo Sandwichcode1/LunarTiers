@@ -1,4 +1,10 @@
 import discord
+WAITLIST_ROLE_ID = 1373005273387503658  # Replace with your Waitlist role ID
+TESTERS_ROLE_ID = 1373005299922663534   # (Optional) Replace with your Testers role ID
+def get_waitlist_role(guild: discord.Guild) -> discord.Role | None:
+    return guild.get_role(WAITLIST_ROLE_ID)
+
+
 from discord.ext import commands
 from discord.ui import View, Button, Modal, TextInput
 import asyncio
@@ -8,7 +14,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+request = commands.Bot(command_prefix='!', intents=intents)
 member = []
 queue = []
 queue_message = None
@@ -20,6 +26,9 @@ user_cooldowns = {}
 allowed_regions = ["NA", "EU", "ASIA", "SA", "OCE", "AFRICA"]
 request_channel_id = 1368153339753140306  # Replace with actual channel ID
 waitlist_role_name = "Waitlist"
+WAITLIST_ROLE_ID = 1373005273387503658  # Replace with your Waitlist role ID
+TESTERS_ROLE_ID = 1373005299922663534   # (Optional) Replace with your Testers role ID
+
 
 class JoinQueueModal(Modal):
     def __init__(self, user: discord.Member):
@@ -53,12 +62,20 @@ class JoinQueueModal(Modal):
         queue.append(entry)
         user_cooldowns[self.user.id] = now + timedelta(days=1)
 
-        waitlist_role = discord.utils.get(interaction.guild.roles, name=waitlist_role_name)
-        if waitlist_role:
-            await self.user.add_roles(waitlist_role)
-
+        
         await update_queue_embed()
         await interaction.response.send_message(f"✅ You joined the queue as **{entry['ign']}** ({entry['region']})!", ephemeral=True)
+
+        waitlist_role = get_waitlist_role(interaction.guild)
+        if waitlist_role:
+         await self.user.add_roles(waitlist_role)
+         overwrites = {
+    guild.default_role: discord.PermissionOverwrite(view_channel=False),
+    get_waitlist_role(guild): discord.PermissionOverwrite(view_channel=True)
+}
+         channel = await guild.create_text_channel("waitlist", overwrites=overwrites)
+
+
 
 class QueueView(View):
     def __init__(self):
@@ -91,7 +108,7 @@ async def update_info_embed():
     embed.set_footer(text="Thanks for using this queue bot!")
     await info_message.edit(embed=embed)
 
-@bot.command()
+@request.command()
 async def createqueue(ctx, *, region: str = "Unknown"):
     global queue_message, info_message, queue_channel, queue_creator, queue_region
     queue.clear()
@@ -112,7 +129,7 @@ async def createqueue(ctx, *, region: str = "Unknown"):
     info_message = await ctx.send(embed=info_embed)
     await ctx.send(f"✅ Queue created by {queue_creator.mention} for region: **{queue_region}**")
 
-@bot.command()
+@request.command()
 async def leave(ctx):
     global queue
     user_id = ctx.author.id
@@ -124,42 +141,55 @@ async def leave(ctx):
     else:
         await ctx.send("You're not in the queue.")
 
-@bot.command()
-async def pull(ctx):
+@request.command()
+async def pull(ctx: int):
     global queue
     if not queue:
         await ctx.send("❌ The queue is empty!")
         return
+
     entry = queue.pop(0)
     user_id = entry["user_id"]
     member = ctx.guild.get_member(user_id)
+
     if member is None:
         await ctx.send(f"❌ Could not find the user {entry['mention']} in the server.")
         await update_queue_embed()
         return
-    category = ctx.channel.category
-    channel_name = f"match-{member.name}".lower()
-    testers_role = discord.utils.get(ctx.guild.roles, name="Testers")
+
+    waitlist_role = get_waitlist_role(ctx.guild)
+    if waitlist_role and waitlist_role in member.roles:
+      await member.remove_roles(waitlist_role)
+
+
+
+    testers_role = discord.utils.get(ctx.guild.roles, name="☑️Verified Tester")
     if testers_role is None:
         await ctx.send("⚠️ Testers role not found! Please create a role named 'Testers'.")
         return
+
+    category = ctx.channel.category
+    channel_name = f"match-{member.name}".lower()
+
     overwrites = {
         ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
         member: discord.PermissionOverwrite(read_messages=True, send_messages=True),
         testers_role: discord.PermissionOverwrite(read_messages=True, send_messages=True),
     }
+
     try:
         new_channel = await ctx.guild.create_text_channel(channel_name, category=category, overwrites=overwrites)
         await new_channel.send(f"{testers_role.mention} {member.mention}, your match channel is ready! 🎮")
         await ctx.send(f"✅ Created {new_channel.mention} and pulled {member.mention} from the queue.")
-        waitlist_role = discord.utils.get(ctx.guild.roles, name=waitlist_role_name)
-        if waitlist_role:
-            await member.remove_roles(waitlist_role)
-        await update_queue_embed()
+        await ctx.send(f"✅ Pulled {member.mention} and removed their Waitlist role.")
+
     except Exception as e:
         await ctx.send(f"❌ Error creating channel: {e}")
 
-@bot.command()
+    await update_queue_embed()
+
+
+@request.command()
 @commands.has_permissions(administrator=True)
 async def close(ctx, member: discord.Member):
     global queue, user_cooldowns
@@ -191,7 +221,7 @@ async def close(ctx, member: discord.Member):
 
     await ctx.send(f"✅ {member.mention} has been removed from the queue, put on cooldown, lost waitlist access, and their match channel was deleted (if existed).")
 
-@bot.command()
+@request.command()
 @commands.has_permissions(administrator=True)
 async def removecooldown(ctx, member: discord.Member):
     if member.id in user_cooldowns:
@@ -200,9 +230,9 @@ async def removecooldown(ctx, member: discord.Member):
     else:
         await ctx.send(f"ℹ️ {member.mention} has no active cooldown.")
 
-@bot.command()
+@request.command()
 async def requesttest(ctx):
-    channel = bot.get_channel(request_channel_id)
+    channel = request.get_channel(request_channel_id)
     if not channel:
         await ctx.send("❌ Could not find the request channel.")
         return
@@ -215,4 +245,4 @@ async def requesttest(ctx):
     await channel.send(embed=embed, view=view)
     await ctx.send("✅ Tier test request message sent.")
 
-bot.run("MTM3MjYzMjcwNDU5OTk4NjIzNw.G0JDtx.5hyjcsY-XFviJ9Z3bn_jDlt2z39J2HVLC_UnYw")
+request.run("MTM3MjYzMzkwNzk5NjEzMTQxOQ.GDjYD7.KUq5c9B6wfMQVDtkMCeiYuVT2gQVSq5QLwkuN0")
