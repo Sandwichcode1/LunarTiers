@@ -4,17 +4,17 @@ TESTERS_ROLE_ID = 1373005299922663534   # (Optional) Replace with your Testers r
 def get_waitlist_role(guild: discord.Guild) -> discord.Role | None:
     return guild.get_role(WAITLIST_ROLE_ID)
 
-
+import os
 from discord.ext import commands
 from discord.ui import View, Button, Modal, TextInput
 import asyncio
 from datetime import datetime, timedelta
-
+from dotenv import load_dotenv
+from pathlib import Path
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
-
-request = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents)
 member = []
 queue = []
 queue_message = None
@@ -28,6 +28,34 @@ request_channel_id = 1368153339753140306  # Replace with actual channel ID
 waitlist_role_name = "Waitlist"
 WAITLIST_ROLE_ID = 1373005273387503658  # Replace with your Waitlist role ID
 TESTERS_ROLE_ID = 1373005299922663534   # (Optional) Replace with your Testers role ID
+import os
+from dotenv import load_dotenv
+from pathlib import Path
+import discord
+from discord.ext import commands
+
+env_path = Path(__file__).parent / 'library.env'  # or '.env'
+print(f"Loading env from: {env_path.resolve()}")
+
+load_dotenv(dotenv_path=env_path)
+
+token = os.getenv("DISCORD_TOKEN")
+print(f"Token loaded: {repr(token)}")
+
+if not token:
+    raise ValueError("DISCORD_TOKEN environment variable not found.")
+
+intents = discord.Intents.all()
+bot = commands.Bot(command_prefix='!', intents=intents)
+
+@bot.event
+async def on_ready():
+    print(f'Logged in as {bot.user}!')
+
+
+
+
+
 
 
 class JoinQueueModal(Modal):
@@ -108,7 +136,7 @@ async def update_info_embed():
     embed.set_footer(text="Thanks for using this queue bot!")
     await info_message.edit(embed=embed)
 
-@request.command()
+@bot.command()
 async def createqueue(ctx, *, region: str = "Unknown"):
     global queue_message, info_message, queue_channel, queue_creator, queue_region
     queue.clear()
@@ -129,7 +157,7 @@ async def createqueue(ctx, *, region: str = "Unknown"):
     info_message = await ctx.send(embed=info_embed)
     await ctx.send(f"✅ Queue created by {queue_creator.mention} for region: **{queue_region}**")
 
-@request.command()
+@bot.command()
 async def leave(ctx):
     global queue
     user_id = ctx.author.id
@@ -141,7 +169,7 @@ async def leave(ctx):
     else:
         await ctx.send("You're not in the queue.")
 
-@request.command()
+@bot.command()
 async def pull(ctx: int):
     global queue
     if not queue:
@@ -189,7 +217,7 @@ async def pull(ctx: int):
     await update_queue_embed()
 
 
-@request.command()
+@bot.command()
 @commands.has_permissions(administrator=True)
 async def close(ctx, member: discord.Member):
     global queue, user_cooldowns
@@ -221,7 +249,7 @@ async def close(ctx, member: discord.Member):
 
     await ctx.send(f"✅ {member.mention} has been removed from the queue, put on cooldown, lost waitlist access, and their match channel was deleted (if existed).")
 
-@request.command()
+@bot.command()
 @commands.has_permissions(administrator=True)
 async def removecooldown(ctx, member: discord.Member):
     if member.id in user_cooldowns:
@@ -230,9 +258,9 @@ async def removecooldown(ctx, member: discord.Member):
     else:
         await ctx.send(f"ℹ️ {member.mention} has no active cooldown.")
 
-@request.command()
+@bot.command()
 async def requesttest(ctx):
-    channel = request.get_channel(request_channel_id)
+    channel = bot.get_channel(request_channel_id)
     if not channel:
         await ctx.send("❌ Could not find the request channel.")
         return
@@ -245,4 +273,4 @@ async def requesttest(ctx):
     await channel.send(embed=embed, view=view)
     await ctx.send("✅ Tier test request message sent.")
 
-request.run("MTM3MjYzMzkwNzk5NjEzMTQxOQ.GpHYbu.31aZu-zH7YhfYX68cRgZ-8RnFwWhehfYP1d7Sk")
+bot.run(token)

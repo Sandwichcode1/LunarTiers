@@ -1,9 +1,11 @@
-import os
 from dotenv import load_dotenv
 from pathlib import Path
+import os
 import discord
 from discord.ext import commands
+from discord.ui import View, Button, Modal, TextInput
 
+# Load env and token once at the top
 env_path = Path(__file__).parent / 'library.env'  # or '.env'
 print(f"Loading env from: {env_path.resolve()}")
 
@@ -14,31 +16,24 @@ print(f"Token loaded: {repr(token)}")
 
 if not token:
     raise ValueError("DISCORD_TOKEN environment variable not found.")
+token = token.strip()
 
+# Set intents once and create bot once
 intents = discord.Intents.all()
-bot = commands.Bot(command_prefix='!', intents=intents)
-
-@bot.event
-async def on_ready():
-    print(f'Logged in as {bot.user}!')
-
-
-
-
-
-bot.run(token)
-
-
-
-from discord.ui import Modal, TextInput  # This only works with Pycord 2.0+
-
-
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+print(discord.__version__)
+print(hasattr(discord, 'Bot'))
+
+# Event for bot ready
+@bot.event
+async def on_ready():
+    print(f"Logged in as {bot.user}!")
+
+# Modal for your example
 class MyModal(Modal):
     def __init__(self):
         super().__init__(title="My Modal")
-
         self.input = TextInput(label="Enter something:")
         self.add_item(self.input)
 
@@ -49,61 +44,24 @@ class MyModal(Modal):
 async def openmodal(ctx):
     await ctx.send_modal(MyModal())
 
-bot.run("MTM3MjYzMzkwNzk5NjEzMTQxOQ.GDjYD7.KUq5c9B6wfMQVDtkMCeiYuVT2gQVSq5QLwkuN0")  # Replace or use an environment variable
-
-import os
-
-import os
-
-
-
-
-
-intents = discord.Intents.default()
-intents.message_content = True
-intents.members = True  # Only needed if your bot uses member info
-intents.presences = True  # Needed for presence (online/offline)
-intents.members = True    # Needed for member info
-
-
-import discord
-
-intents = discord.Intents.default()
-intents.message_content = True  # Needed to read message content
-intents.members = True          # Needed for member events
-intents.guilds = True
-
-bot = discord.Bot(intents=intents)
-
-
-
-
-
-
-bot = commands.Bot(command_prefix="!", intents=intents)
-
-
-
-
-
+# Queue system
 queue = []  # list of dicts with keys: user_id, mention, ign, region
 queue_message = None
 info_message = None
 queue_channel = None
 queue_creator = None
 queue_region = None
+user_cooldowns = {}
 
-bot = discord.Bot(intents=discord.Intents.all())
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def removecooldown(ctx, member: discord.Member):
     """Remove the 24h cooldown for a specific user."""
-    if member.id in user_cooldowns: # type: ignore
-        del user_cooldowns[member.id] # type: ignore
+    if member.id in user_cooldowns:
+        del user_cooldowns[member.id]
         await ctx.send(f"✅ Cooldown removed for {member.mention}.")
     else:
         await ctx.send(f"ℹ️ {member.mention} has no active cooldown.")
-
 
 class JoinQueueModal(Modal):
     def __init__(self, user: discord.Member):
@@ -166,7 +124,6 @@ async def update_info_embed():
     embed.set_footer(text="Thanks for using this queue bot!")
     await info_message.edit(embed=embed)
 
-
 @bot.command()
 async def leave(ctx):
     global queue
@@ -219,27 +176,12 @@ async def closequeue(ctx):
     except Exception as e:
         await ctx.send(f"❌ Error closing queue: {e}")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @bot.command()
 async def requesttest(ctx):
     """Send a test join queue message in a different channel."""
 
     # Replace this with your target channel ID where you want the test message to go
-    target_channel_id = 1368153339753140306 # <-- put the actual channel ID here
+    target_channel_id = 1368153339753140306  # <-- put the actual channel ID here
 
     target_channel = ctx.guild.get_channel(target_channel_id)
     if not target_channel:
@@ -256,5 +198,7 @@ async def requesttest(ctx):
     view = QueueView()
 
     await target_channel.send(embed=embed, view=view)
-    
-bot.run("MTM3MjYzMzkwNzk5NjEzMTQxOQ.GpHYbu.31aZu-zH7YhfYX68cRgZ-8RnFwWhehfYP1d7Sk")
+
+# Run the bot at the very end
+
+bot.run(token)
