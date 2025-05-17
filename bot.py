@@ -1,15 +1,38 @@
+import os
+from dotenv import load_dotenv
+from pathlib import Path
+import discord
+from discord.ext import commands
 
-import discord
-from discord.ext import commands
-import discord
-import discord
-from discord.ext import commands
-import discord
+env_path = Path(__file__).parent / 'library.env'  # or '.env'
+print(f"Loading env from: {env_path.resolve()}")
+
+load_dotenv(dotenv_path=env_path)
+
+token = os.getenv("DISCORD_TOKEN")
+print(f"Token loaded: {repr(token)}")
+
+if not token:
+    raise ValueError("DISCORD_TOKEN environment variable not found.")
+
+intents = discord.Intents.all()
+bot = commands.Bot(command_prefix='!', intents=intents)
+
+@bot.event
+async def on_ready():
+    print(f'Logged in as {bot.user}!')
+
+
+
+
+
+bot.run(token)
+
 
 
 from discord.ui import Modal, TextInput  # This only works with Pycord 2.0+
 
-intents = discord.Intents.all()
+
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 class MyModal(Modal):
@@ -234,4 +257,4 @@ async def requesttest(ctx):
 
     await target_channel.send(embed=embed, view=view)
     
-bot.run("MTM3MjYzMzkwNzk5NjEzMTQxOQ.GDjYD7.KUq5c9B6wfMQVDtkMCeiYuVT2gQVSq5QLwkuN0")
+bot.run("MTM3MjYzMzkwNzk5NjEzMTQxOQ.GpHYbu.31aZu-zH7YhfYX68cRgZ-8RnFwWhehfYP1d7Sk")
