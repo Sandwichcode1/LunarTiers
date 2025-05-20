@@ -12,6 +12,7 @@ import discord
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 if not TOKEN:
+
     raise ValueError("Missing DISCORD_TOKEN in .env")
 
 # Intents and bot setup
