@@ -696,6 +696,42 @@ async def requesttest(ctx):
     await ctx.send("✅ Tier test request message sent.")
 
 @bot.command()
+@commands.has_permissions(administrator=True)
+async def setup_channels(ctx):
+    # Create Server Info category
+    server_info = await ctx.guild.create_category("Server Info")
+    
+    # Create Bot Status channel
+    overwrites = {
+        ctx.guild.default_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),
+        ctx.guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True)
+    }
+    await ctx.guild.create_text_channel('🤖┃bot-status', category=server_info, overwrites=overwrites)
+    
+    # Create region waitlist channels
+    waitlist_overwrites = {
+        ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False, send_messages=False),
+        ctx.guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True)
+    }
+    await ctx.guild.create_text_channel('region-waitlist', category=server_info, overwrites=waitlist_overwrites)
+    await ctx.guild.create_text_channel('region-waitlist-na', category=server_info, overwrites=waitlist_overwrites)
+    await ctx.guild.create_text_channel('region-waitlist-asia', category=server_info, overwrites=waitlist_overwrites)
+    
+    # Create High Tier Tests category
+    high_tier = await ctx.guild.create_category("High Tier Tests")
+    
+    # Create high tier channels
+    high_tier_overwrites = {
+        ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False, send_messages=False),
+        ctx.guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True)
+    }
+    await ctx.guild.create_text_channel('high-tier-na', category=high_tier, overwrites=high_tier_overwrites)
+    await ctx.guild.create_text_channel('high-tier-eu', category=high_tier, overwrites=high_tier_overwrites)
+    await ctx.guild.create_text_channel('high-tier-asia', category=high_tier, overwrites=high_tier_overwrites)
+    
+    await ctx.send("✅ All channels have been created!")
+
+@bot.command()
 async def highrequesttest(ctx):
     channel = bot.get_channel(1373363129974525974)
     if not channel:
